@@ -1,0 +1,46 @@
+---
+title: "Peer-graded Assignment:<br>R Markdown, Presentation & Plotly"
+author: "Edmond Ho-Yin Lau"
+date: "September 1, 2020"
+output: ioslides_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(comment = "")
+knitr::opts_chunk$set(warning=FALSE)
+knitr::opts_chunk$set(message=FALSE)
+```
+
+
+## Load and Prepare Data
+```{r, echo = TRUE}
+library(plotly)
+data <- diamonds[sample(nrow(diamonds), 2500), 
+                 c("carat", "price", "clarity", "depth")]
+summary(data)
+```
+
+## Create 2D and 3D Scatter Plots
+```{r, echo = TRUE}
+p1 <- plot_ly(data, x = ~carat, y = ~price, color = ~carat,
+        size = ~carat, text = ~paste("Clarity: ", clarity))
+p2 <- plot_ly(data, x = ~carat, y = ~price, z = ~depth,
+        color = ~carat, size = ~carat, 
+        text = ~paste("Clarity: ", clarity)) 
+```
+
+## Show 2D Scatter Plot
+
+```{r}
+ggplotly(p1)
+```
+
+## Show 3D Scatter Plot
+
+```{r}
+ggplotly(p2)
+```
+
+
+## Thank You

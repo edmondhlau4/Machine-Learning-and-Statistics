@@ -1,0 +1,215 @@
+---
+title: "My First Leaflet Map"
+author: "Edmond Ho-Yin Lau"
+date: "September 1, 2020"
+output: html_document
+---
+
+```{r, echo=FALSE}
+# Oldest colleges / universities in the U.S. listed 
+library(leaflet)
+univSites <- c(
+  "<a href='http://www.harvard.edu'>Harvard University - #1 - 1636</a>",
+  "<a href='http://www.wm.edu'>The College of William and Mary - #2 - 1693</a>",
+  "<a href='https://www.sjc.edu'>St. John&quot;s College - Annapolis - #3 - 1696</a>",
+  "<a href='https://www.yale.edu'>Yale University - #4 - 1701</a>",
+  "<a href='https://www.washcoll.edu'>Washington College - #5 - 1723</a>",
+  "<a href='http://www.upenn.edu'>University of Pennsylvania - #6 - 1740</a>",
+  "<a href='https://www.moravian.edu'>Moravian College - #7 - 1742</a>",
+  "<a href='http://www.udel.edu'>University of Delaware - #8 - 1743</a>",
+  "<a href='https://www.princeton.edu'>Princeton University - #9 - 1746</a>",
+  "<a href='https://www.wlu.edu'>Washington and Lee University - #10 - 1749</a>",
+  "<a href='http://www.columbia.edu'>Columbia University - #11 - 1754</a>",
+  "<a href='https://www.brown.edu'>Brown University - #12 - 1764</a>",
+  "<a href='http://www.rutgers.edu'>Rutgers University - #13 - 1766</a>",
+  "<a href='http://dartmouth.edu'>Dartmouth College - #14 - 1769</a>",
+  "<a href='http://www.cofc.edu'>College of Charleston - #15 - 1770</a>",
+  "<a href='http://www.salem.edu'>Salem College - #16 - 1772</a>",
+  "<a href='http://www.dickinson.edu'>Dickinson College - #17 - 1773</a>",
+  "<a href='http://www.hsc.edu'>Hampden-Sydney College - #18 - 1775</a>",
+  "<a href='http://www.transy.edu'>Transylvania University - #19 - 1780</a>",
+  "<a href='http://www.washjeff.edu'>Washington & Jefferson College - #20 - 1781</a>")
+univLatLon <- data.frame(
+  lat = c(42.374229, 37.270807, 38.982013, 41.308983, 39.217590,
+          39.951984, 40.630886, 39.677798, 40.348693, 37.790948,
+          40.807418, 41.826152, 40.499077, 43.703560, 32.783729,
+          36.087818, 40.202728, 37.240705, 38.053041, 40.170818),
+  lng = c(-71.116510, -76.713458, -76.491536, -72.928518, -76.068347,
+          -75.193753, -75.381207, -75.750512, -74.657560, -79.445050,
+          -73.962275, -71.403157, -74.446761, -72.288551, -79.937195,
+          -80.239887, -77.197223, -78.460566, -84.493788, -80.241216)
+)
+harvardIcon <- makeIcon(
+  iconUrl='https://upload.wikimedia.org/wikipedia/commons/3/36/Harvard_Wreath_Logo_1.png',
+  iconWidth=31 * 215 / 230,
+  iconHeight=31,
+  iconAnchorX=31 * 215 / 230 / 2,
+  iconAnchorY=16
+)
+w_and_mIcon <- makeIcon(
+  iconUrl='https://upload.wikimedia.org/wikipedia/commons/8/88/New_William_%26_Mary_Logo.gif',
+  iconWidth=31 * 215 / 230,
+  iconHeight=31,
+  iconAnchorX=31 * 215 / 230 / 2,
+  iconAnchorY=16
+)
+stJohnsIcon <- makeIcon(
+  iconUrl='https://upload.wikimedia.org/wikipedia/commons/7/7d/SJC_Logo_brick_Grey_RGB_web.jpg',
+  iconWidth=31 * 215 / 230,
+  iconHeight=31,
+  iconAnchorX=31 * 215 / 230 / 2,
+  iconAnchorY=16
+)
+yaleIcon <- makeIcon(
+  iconUrl='https://upload.wikimedia.org/wikipedia/commons/0/07/Yale_University_Shield_1.svg',
+  iconWidth=31 * 215 / 230,
+  iconHeight=31,
+  iconAnchorX=31 * 215 / 230 / 2,
+  iconAnchorY=16
+)
+washIcon <- makeIcon(
+  iconUrl='https://upload.wikimedia.org/wikipedia/commons/e/e7/Casey_Academic_Center.JPG',
+  iconWidth=31 * 215 / 230,
+  iconHeight=31,
+  iconAnchorX=31 * 215 / 230 / 2,
+  iconAnchorY=16
+)
+pennIcon <- makeIcon(
+  iconUrl='https://upload.wikimedia.org/wikipedia/commons/9/92/UPenn_shield_with_banner.svg',
+  iconWidth=31 * 215 / 230,
+  iconHeight=31,
+  iconAnchorX=31 * 215 / 230 / 2,
+  iconAnchorY=16
+)
+moravianIcon <- makeIcon(
+  iconUrl='https://upload.wikimedia.org/wikipedia/commons/d/de/Moravian_College_Logo.jpg',
+  iconWidth=31 * 215 / 230,
+  iconHeight=31,
+  iconAnchorX=31 * 215 / 230 / 2,
+  iconAnchorY=16
+)
+delawareIcon <- makeIcon(
+  iconUrl='https://upload.wikimedia.org/wikipedia/commons/b/b3/University_of_Delaware_wordmark.svg',
+  iconWidth=31 * 215 / 230,
+  iconHeight=31,
+  iconAnchorX=31 * 215 / 230 / 2,
+  iconAnchorY=16
+)
+princetonIcon <- makeIcon(
+  iconUrl='https://upload.wikimedia.org/wikipedia/commons/f/f1/Princetonshieldlarge.png',
+  iconWidth=31 * 215 / 230,
+  iconHeight=31,
+  iconAnchorX=31 * 215 / 230 / 2,
+  iconAnchorY=16
+)
+washLeeIcon <- makeIcon(
+  iconUrl='https://upload.wikimedia.org/wikipedia/commons/5/58/W%26L_symbol.png',
+  iconWidth=31 * 215 / 230,
+  iconHeight=31,
+  iconAnchorX=31 * 215 / 230 / 2,
+  iconAnchorY=16
+)
+columbiaIcon <- makeIcon(
+  iconUrl='https://upload.wikimedia.org/wikipedia/commons/c/ce/ColumbiaU_Wordmarklogo.JPG',
+  iconWidth=31 * 215 / 230,
+  iconHeight=31,
+  iconAnchorX=31 * 215 / 230 / 2,
+  iconAnchorY=16
+)
+brownIcon <- makeIcon(
+  iconUrl='https://upload.wikimedia.org/wikipedia/commons/1/1b/Brown_University_Logo.svg',
+  iconWidth=31 * 215 / 230,
+  iconHeight=31,
+  iconAnchorX=31 * 215 / 230 / 2,
+  iconAnchorY=16
+)
+rutgersIcon <- makeIcon(
+  iconUrl='https://upload.wikimedia.org/wikipedia/commons/1/1f/Rutgers_logotype.png',
+  iconWidth=31 * 215 / 230,
+  iconHeight=31,
+  iconAnchorX=31 * 215 / 230 / 2,
+  iconAnchorY=16
+)
+dartmouthIcon <- makeIcon(
+  iconUrl='https://upload.wikimedia.org/wikipedia/commons/9/9c/Dartmouth_shield.png',
+  iconWidth=31 * 215 / 230,
+  iconHeight=31,
+  iconAnchorX=31 * 215 / 230 / 2,
+  iconAnchorY=16
+)
+charlestonIcon <- makeIcon(
+  iconUrl='https://upload.wikimedia.org/wikipedia/commons/8/88/CoCwordmark.svg',
+  iconWidth=31 * 215 / 230,
+  iconHeight=31,
+  iconAnchorX=31 * 215 / 230 / 2,
+  iconAnchorY=16
+)
+salemIcon <- makeIcon(
+  iconUrl='https://upload.wikimedia.org/wikipedia/commons/d/df/Salem_College_01.jpg',
+  iconWidth=31 * 215 / 230,
+  iconHeight=31,
+  iconAnchorX=31 * 215 / 230 / 2,
+  iconAnchorY=16
+)
+dickinsonIcon <- makeIcon(
+  iconUrl='https://upload.wikimedia.org/wikipedia/commons/e/e6/Dickinson_College_Gate.jpg',
+  iconWidth=31 * 215 / 230,
+  iconHeight=31,
+  iconAnchorX=31 * 215 / 230 / 2,
+  iconAnchorY=16
+)
+hscIcon <- makeIcon(
+  iconUrl='https://upload.wikimedia.org/wikipedia/commons/6/64/HSC_Historical_Marker.JPG',
+  iconWidth=31 * 215 / 230,
+  iconHeight=31,
+  iconAnchorX=31 * 215 / 230 / 2,
+  iconAnchorY=16
+)
+transyIcon <- makeIcon(
+  iconUrl='https://upload.wikimedia.org/wikipedia/commons/3/35/Original_Seal_of_Transylvania_University.jpg',
+  iconWidth=31 * 215 / 230,
+  iconHeight=31,
+  iconAnchorX=31 * 215 / 230 / 2,
+  iconAnchorY=16
+)
+washJeffIcon <- makeIcon(
+  iconUrl='https://upload.wikimedia.org/wikipedia/commons/c/c2/W%26J_seal_old_updated_color.svg',
+  iconWidth=31 * 215 / 230,
+  iconHeight=31,
+  iconAnchorX=31 * 215 / 230 / 2,
+  iconAnchorY=16
+)
+stdIcon <- makeIcon(
+  iconUrl='http://maps.google.com/mapfiles/kml/pushpin/blue-pushpin.png',
+  iconWidth=31 * 215 / 230,
+  iconHeight=31,
+  iconAnchorX=31 * 215 / 230 / 2,
+  iconAnchorY=16
+)
+univIcons <- iconList(
+  harvardIcon,
+  w_and_mIcon,
+  stJohnsIcon,
+  yaleIcon,
+  washIcon,
+  pennIcon,
+  moravianIcon,
+  delawareIcon,
+  princetonIcon,
+  washLeeIcon,
+  columbiaIcon,
+  brownIcon,
+  rutgersIcon,
+  dartmouthIcon,
+  charlestonIcon,
+  salemIcon,
+  dickinsonIcon,
+  hscIcon,
+  transyIcon,
+  washJeffIcon
+)
+univLatLon %>%
+  leaflet() %>%
+  addTiles() %>%
+  addMarkers(icon=univIcons, popup=univSites)
+```
